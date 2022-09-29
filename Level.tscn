@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Box.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Character.tscn" type="PackedScene" id=2]
+
+[node name="Level" type="Node2D"]
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+z_index = -1
+color = Color( 0.0509804, 0.513726, 0, 1 )
+polygon = PoolVector2Array( 0, 0, 320, 0, 320, 180, 0, 180 )
+
+[node name="YSort" type="YSort" parent="."]
+
+[node name="Box" parent="YSort" instance=ExtResource( 1 )]
+position = Vector2( 155, 123 )
+
+[node name="Character" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 222, 103 )
