@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Box.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Character.tscn" type="PackedScene" id=2]
-[ext_resource path="res://box-shadow.png" type="Texture" id=3]
 
 [node name="Level" type="Node2D"]
 
@@ -13,14 +11,21 @@ polygon = PoolVector2Array( 0, 0, 320, 0, 320, 180, 0, 180 )
 
 [node name="YSort" type="YSort" parent="."]
 
-[node name="Box-shadow" type="Sprite" parent="YSort"]
-modulate = Color( 1, 0, 1, 1 )
-position = Vector2( 151, 94 )
-z_index = -3
-texture = ExtResource( 3 )
-
-[node name="Box" parent="YSort" instance=ExtResource( 1 )]
-position = Vector2( 87, 120 )
-
 [node name="Character" parent="YSort" instance=ExtResource( 2 )]
 position = Vector2( 188, 99 )
+
+[node name="Polygon2D" type="Polygon2D" parent="YSort"]
+z_index = -1
+color = Color( 1, 0, 1, 1 )
+polygon = PoolVector2Array( 126, 109, 150, 115, 142, 90, 149, 86, 150, 74, 140, 66, 127, 66, 120, 70, 110, 73, 111, 85, 102, 103, 112, 115 )
+
+[node name="Polygon2D2" type="Polygon2D" parent="YSort"]
+position = Vector2( -13, 8 )
+z_index = -1
+color = Color( 1, 0, 1, 1 )
+polygon = PoolVector2Array( 171, 108, 155, 97, 175, 74, 247, 131, 212, 131, 211, 118, 201, 125, 204, 109, 182, 121, 182, 115 )
+
+[node name="Polygon2D3" type="Polygon2D" parent="YSort"]
+z_index = -1
+color = Color( 0.0509804, 0.513726, 0, 1 )
+polygon = PoolVector2Array( 123, 93, 123, 87, 130, 88 )

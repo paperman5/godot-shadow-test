@@ -9,6 +9,7 @@ code = "shader_type canvas_item;
 
 uniform vec2 shadow_vec = vec2(0.0);
 uniform vec4 shadow_color : hint_color;
+uniform bool pixelate = false;
 
 void fragment() {
 	vec2 display_size = 1.0 / fwidth(UV); // onscreen size in pixels
@@ -16,20 +17,24 @@ void fragment() {
 	vec2 sample_loc = vec2(FRAGCOORD.x, FRAGCOORD.y - local_pos.y);
 	sample_loc.y -= local_pos.y * shadow_vec.y;
 	sample_loc.x += shadow_vec.x * local_pos.y;
+	sample_loc = round(sample_loc / SCREEN_PIXEL_SIZE) * SCREEN_PIXEL_SIZE; // fix some artifacts
 	
 	vec4 c = texelFetch(SCREEN_TEXTURE, ivec2(sample_loc), 0);
 	
+	vec4 tex = texture(TEXTURE, UV);
+	
 	if (c == shadow_color) {
-		COLOR = shadow_color;
+		COLOR = vec4(tex.rgb * 0.5, tex.a);
 	} else {
-		COLOR = texture(TEXTURE, UV);
+		COLOR = tex;
 	}
 }"
 
 [sub_resource type="ShaderMaterial" id=4]
 shader = SubResource( 3 )
-shader_param/shadow_vec = Vector2( 1, 0.5 )
+shader_param/shadow_vec = Vector2( 1, 0 )
 shader_param/shadow_color = Color( 1, 0, 1, 1 )
+shader_param/pixelate = true
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 3 )

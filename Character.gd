@@ -4,7 +4,6 @@ export var move_speed := 5000.0
 
 var shear := 0.5
 
-onready var poly = get_node("Polygon2D")
 onready var spr = get_node("Sprite")
 
 func _physics_process(delta):
