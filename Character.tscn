@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Character.gd" type="Script" id=1]
 [ext_resource path="res://character.png" type="Texture" id=2]
@@ -7,6 +7,7 @@
 [sub_resource type="Shader" id=3]
 code = "shader_type canvas_item;
 
+uniform sampler2D shadow_texture : hint_white;
 uniform vec2 shadow_vec = vec2(0.0);
 uniform vec4 shadow_color : hint_color;
 uniform bool pixelate = false;
@@ -15,26 +16,38 @@ void fragment() {
 	vec2 display_size = 1.0 / fwidth(UV); // onscreen size in pixels
 	vec2 local_pos = vec2(UV.x * display_size.x, (1.0 - UV.y) * display_size.y); // local position from bottom-left in pixels
 	vec2 sample_loc = vec2(FRAGCOORD.x, FRAGCOORD.y - local_pos.y);
-	sample_loc.y -= local_pos.y * shadow_vec.y;
 	sample_loc.x += shadow_vec.x * local_pos.y;
-	sample_loc = round(sample_loc / SCREEN_PIXEL_SIZE) * SCREEN_PIXEL_SIZE; // fix some artifacts
+	sample_loc.y -= shadow_vec.y * local_pos.y;
+	sample_loc *= SCREEN_PIXEL_SIZE;
+	sample_loc = vec2(sample_loc.x, 1.0 - sample_loc.y); // transform to screen UV space
 	
-	vec4 c = texelFetch(SCREEN_TEXTURE, ivec2(sample_loc), 0);
+	vec4 c = texture(shadow_texture, sample_loc);
 	
 	vec4 tex = texture(TEXTURE, UV);
 	
-	if (c == shadow_color) {
-		COLOR = vec4(tex.rgb * 0.5, tex.a);
+	COLOR = c;
+	
+	if (c.a > 0.1) {
+		COLOR = vec4(tex.rgb * shadow_color.rgb, tex.a);
 	} else {
 		COLOR = tex;
 	}
 }"
 
+[sub_resource type="Gradient" id=5]
+offsets = PoolRealArray( 0 )
+colors = PoolColorArray( 0.117647, 0.117647, 0.117647, 0 )
+
+[sub_resource type="GradientTexture" id=6]
+gradient = SubResource( 5 )
+
 [sub_resource type="ShaderMaterial" id=4]
+resource_local_to_scene = true
 shader = SubResource( 3 )
-shader_param/shadow_vec = Vector2( 1, 0 )
-shader_param/shadow_color = Color( 1, 0, 1, 1 )
+shader_param/shadow_vec = Vector2( 1, 0.125 )
+shader_param/shadow_color = Color( 0.670588, 0.690196, 0.890196, 1 )
 shader_param/pixelate = true
+shader_param/shadow_texture = SubResource( 6 )
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8, 3 )
@@ -45,7 +58,7 @@ script = ExtResource( 1 )
 [node name="Sprite2" type="Sprite" parent="."]
 visible = false
 modulate = Color( 1, 0, 1, 1 )
-position = Vector2( 8, 23 )
+position = Vector2( 8, 11 )
 texture = ExtResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="."]

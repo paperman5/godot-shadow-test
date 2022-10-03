@@ -1,12 +1,48 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=8 format=2]
 
+[ext_resource path="res://box-shadow.png" type="Texture" id=1]
 [ext_resource path="res://Character.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Level.gd" type="Script" id=3]
+[ext_resource path="res://Box.tscn" type="PackedScene" id=4]
+
+[sub_resource type="Shader" id=2]
+code = "shader_type canvas_item;
+
+uniform vec4 shadow_color : hint_color;
+
+void fragment() {
+	vec4 tex = texture(TEXTURE, UV);
+	vec4 scr = texture(SCREEN_TEXTURE, SCREEN_UV);
+	COLOR = vec4(scr.rgb * shadow_color.rgb, tex.a);
+}"
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = SubResource( 2 )
+shader_param/shadow_color = Color( 0.670588, 0.690196, 0.890196, 1 )
+
+[sub_resource type="ViewportTexture" id=1]
+viewport_path = NodePath("ShadowViewport")
 
 [node name="Level" type="Node2D"]
+script = ExtResource( 3 )
 
-[node name="Polygon2D" type="Polygon2D" parent="."]
+[node name="ShadowViewport" type="Viewport" parent="."]
+size = Vector2( 320, 180 )
+transparent_bg = true
+hdr = false
+disable_3d = true
+usage = 0
+render_target_v_flip = true
+
+[node name="Background" type="Polygon2D" parent="."]
 z_index = -10
 color = Color( 0.0509804, 0.513726, 0, 1 )
+polygon = PoolVector2Array( 0, 0, 320, 0, 320, 180, 0, 180 )
+
+[node name="ShadowLayer" type="Polygon2D" parent="."]
+material = SubResource( 3 )
+z_index = -3
+texture = SubResource( 1 )
 polygon = PoolVector2Array( 0, 0, 320, 0, 320, 180, 0, 180 )
 
 [node name="YSort" type="YSort" parent="."]
@@ -14,18 +50,10 @@ polygon = PoolVector2Array( 0, 0, 320, 0, 320, 180, 0, 180 )
 [node name="Character" parent="YSort" instance=ExtResource( 2 )]
 position = Vector2( 188, 99 )
 
-[node name="Polygon2D" type="Polygon2D" parent="YSort"]
-z_index = -1
-color = Color( 1, 0, 1, 1 )
-polygon = PoolVector2Array( 126, 109, 150, 115, 142, 90, 149, 86, 150, 74, 140, 66, 127, 66, 120, 70, 110, 73, 111, 85, 102, 103, 112, 115 )
+[node name="Box" parent="YSort" instance=ExtResource( 4 )]
+position = Vector2( 84, 102 )
 
-[node name="Polygon2D2" type="Polygon2D" parent="YSort"]
-position = Vector2( -13, 8 )
-z_index = -1
-color = Color( 1, 0, 1, 1 )
-polygon = PoolVector2Array( 171, 108, 155, 97, 175, 74, 247, 131, 212, 131, 211, 118, 201, 125, 204, 109, 182, 121, 182, 115 )
-
-[node name="Polygon2D3" type="Polygon2D" parent="YSort"]
-z_index = -1
-color = Color( 0.0509804, 0.513726, 0, 1 )
-polygon = PoolVector2Array( 123, 93, 123, 87, 130, 88 )
+[node name="Sprite" type="Sprite" parent="YSort" groups=["shadow"]]
+modulate = Color( 0, 0, 0, 1 )
+position = Vector2( 124, 78 )
+texture = ExtResource( 1 )
