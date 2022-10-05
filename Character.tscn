@@ -15,7 +15,15 @@ uniform bool pixelate = false;
 void fragment() {
 	vec2 display_size = 1.0 / fwidth(UV); // onscreen size in pixels
 	vec2 local_pos = vec2(UV.x * display_size.x, (1.0 - UV.y) * display_size.y); // local position from bottom-left in pixels
-	vec2 sample_loc = vec2(FRAGCOORD.x, FRAGCOORD.y - local_pos.y);
+	vec2 pixel_pos = floor(vec2(UV.x / TEXTURE_PIXEL_SIZE.x, (1.0 - UV.y) / TEXTURE_PIXEL_SIZE.y)); // texture-pixel location
+	vec2 subpixel_pos = local_pos - pixel_pos * TEXTURE_PIXEL_SIZE * display_size;
+	vec2 sample_loc = FRAGCOORD.xy;
+//	vec2 sample_loc = vec2(FRAGCOORD.x, FRAGCOORD.y - local_pos.y);
+	if (pixelate) {
+		local_pos -= subpixel_pos;
+		sample_loc -= subpixel_pos;
+	}
+	sample_loc -= vec2(0.0, local_pos.y);
 	sample_loc.x += shadow_vec.x * local_pos.y;
 	sample_loc.y -= shadow_vec.y * local_pos.y;
 	sample_loc *= SCREEN_PIXEL_SIZE;
@@ -34,17 +42,17 @@ void fragment() {
 	}
 }"
 
-[sub_resource type="Gradient" id=5]
-offsets = PoolRealArray( 0 )
-colors = PoolColorArray( 0.117647, 0.117647, 0.117647, 0 )
+[sub_resource type="Gradient" id=7]
+offsets = PoolRealArray( 0.740385 )
+colors = PoolColorArray( 1, 1, 1, 0 )
 
 [sub_resource type="GradientTexture" id=6]
-gradient = SubResource( 5 )
+gradient = SubResource( 7 )
 
 [sub_resource type="ShaderMaterial" id=4]
 resource_local_to_scene = true
 shader = SubResource( 3 )
-shader_param/shadow_vec = Vector2( 1, 0.125 )
+shader_param/shadow_vec = Vector2( 2.125, 0.688 )
 shader_param/shadow_color = Color( 0.670588, 0.690196, 0.890196, 1 )
 shader_param/pixelate = true
 shader_param/shadow_texture = SubResource( 6 )
